@@ -9,9 +9,9 @@ import (
 )
 
 var (
-	videodir = flag.String("d", "/tmp/video", "Video source dirctory default:/tmp/video")
-	port     = flag.String("p", "8888", "Port number default:8888")
-	num      = flag.Int("w", 4, "Number of encoder workers defualt:4")
+	videodir = flag.String("d", "/tmp/video", "Video source dirctory")
+	port     = flag.String("p", "8888", "Port number")
+	num      = flag.Int("w", 4, "Number of encoder workers")
 )
 
 func run() {
