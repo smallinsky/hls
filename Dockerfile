@@ -1,22 +1,9 @@
-FROM ubuntu:latest
+FROM golang:1.10.3-alpine3.7
+COPY . /go/src/github.com/smallinsky/hls
+RUN go install github.com/smallinsky/hls/cmd/hlsrun
 
-RUN  apt-get update && apt-get install -y \
-    wget \
-    tar \
-    git \
-    ffmpeg
-
-
-RUN wget https://storage.googleapis.com/golang/go1.8.linux-amd64.tar.gz
-RUN tar -xvf go1.8.linux-amd64.tar.gz
-RUN mv go /usr/local
-ENV GOROOT=/usr/local/go
-ENV PATH=$GOPATH/bin:$GOROOT/bin:$PATH
-RUN go get -u golang.org/x/sys/unix
-
-
-RUN mkdir hls
-COPY src hls
-RUN cd hls && go build
-
-RUN mkdir video
+FROM alpine:3.7
+RUN apk --no-cache add ffmpeg
+COPY --from=0 /go/bin/hlsrun /hlsrun
+RUN mkdir /tmp/video && mkdir /tmp/segments
+RUN /hlsrun -d /tmp/video -s /tmp/segments -p 8080

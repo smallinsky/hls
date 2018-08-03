@@ -4,22 +4,20 @@ import (
 	"strings"
 	"unsafe"
 
+	"github.com/pkg/errors"
 	"golang.org/x/sys/unix"
 )
 
 func WatchDir(dir string) (chan string, error) {
 	fd, err := unix.InotifyInit()
 	if fd == -1 {
-		return err
+		return nil, errors.Wrap(err, "inotify syscall failed")
 	}
-
 	wd, err := unix.InotifyAddWatch(fd, dir, unix.IN_ALL_EVENTS)
 	if wd == -1 {
-		return err
+		return nil, errors.Wrap(err, "inotify_add_watch syscall failed")
 	}
-
 	var buf [(unix.SizeofInotifyEvent + unix.PathMax) * 128]byte
-
 	ch := make(chan string)
 	go func() {
 		for {
@@ -50,5 +48,5 @@ func WatchDir(dir string) (chan string, error) {
 			}
 		}
 	}()
-	return ch
+	return ch, nil
 }
